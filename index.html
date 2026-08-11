@@ -34,8 +34,10 @@
             flex-grow: 1; 
             display: flex; 
             justify-content: center; 
-            overflow: auto; 
+            /* Hide scrollbars during the split-second download scale */
+            overflow: hidden; 
             min-width: 300px;
+            height: 800px; /* fixed height taa k layout na hilay */
         }
         
         h2 { color: #15803d; margin-top: 0; }
@@ -58,32 +60,33 @@
         .btn-whatsapp { background: #16a34a; }
         .btn-whatsapp:hover { background: #15803d; }
         
+        /* TRUE 4K SETUP */
         .preview-wrapper { 
-            width: 1024px; 
-            height: 1024px; 
+            width: 4096px; 
+            height: 4096px; 
             transform-origin: top left; 
-            transform: scale(0.6); /* Default screen scale */
+            /* Screen par fit karne k liye scale */
+            transform: scale(0.18); 
         }
 
         #invite-preview {
-            width: 1024px; 
-            height: 1024px;
+            width: 4096px; 
+            height: 4096px;
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
             background-color: white;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
-            text-rendering: optimizeLegibility; /* Text quality fix */
+            text-rendering: optimizeLegibility;
         }
 
+        /* Fonts multiplied by 4 to match 4096 resolution */
         #dynamic-name { 
             position: absolute; 
             top: 15%; 
             left: 12.2%; 
-            font-size: 30px; 
+            font-size: 120px; 
             font-weight: bold; 
             color: black; 
-            letter-spacing: normal;
         }
         
         #dynamic-sender-box { 
@@ -92,12 +95,11 @@
             left: 12.2%; 
             color: black; 
             line-height: 1.2;
-            letter-spacing: normal;
         }
         
-        .sender-name { font-size: 30px; font-weight: bold; margin-bottom: 5px; }
-        .sender-title { font-size: 20px; font-weight: normal; }
-        .sender-company { font-size: 40px; font-weight: bold; margin-top: 5px; }
+        .sender-name { font-size: 120px; font-weight: bold; margin-bottom: 20px; }
+        .sender-title { font-size: 80px; font-weight: normal; }
+        .sender-company { font-size: 160px; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -157,21 +159,21 @@
             const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            // BUG FIX: Temporarily remove the scale to let html2canvas calculate correct text spacing
+            // Temporary scale removal so tool captures the raw 4096x4096 resolution
             wrapper.style.transform = 'scale(1)';
             
-            // Ensure 4096x4096 resolution (1024 x 4 = 4096)
             html2canvas(previewElement, { 
-                scale: 4, 
-                useCORS: true 
+                scale: 1, // original 1:1 scale
+                useCORS: true,
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 1.0);
                 link.click();
                 
-                // Put the scale back so the layout stays correct on screen
-                wrapper.style.transform = 'scale(0.6)';
+                // Return to screen scale
+                wrapper.style.transform = 'scale(0.18)';
             });
         }
 

@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPAK Dawat 2026 - Invite Generator</title>
-    <!-- Tailwind CSS for Professional Styling -->
+    <!-- Tailwind CSS for Interface Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <!-- html2canvas for downloading the invite -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -16,46 +16,80 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
+        
         /* 
-         * The invite preview container.
-         * Set your exact width and height to match "Group 4.pdf" proportions.
-         * The background image URL should point to your repository.
+         * Preview Container Setup
+         * Dimension 1000x1000 rakhi hai taa k 60px aur 40px font size 
+         * 4096x4096 ki ratio k mutabiq properly scale aur render ho.
          */
+        .preview-wrapper {
+            width: 1000px;
+            height: 1000px;
+            /* Scale down for smaller screens in preview, but keeps original 1000x1000 for download */
+            transform-origin: top left;
+        }
+
         #invite-preview {
-            width: 600px;
-            height: 800px;
-            background-image: url('YOUR_BACKGROUND_IMAGE_URL_HERE.jpg'); 
+            width: 1000px;
+            height: 1000px;
+            background-image: url('background.jpg'); 
             background-size: cover;
             background-position: center;
             position: relative;
-            background-color: #ffffff; /* Fallback color */
+            background-color: #ffffff;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* Positioning the dynamic text elements */
+        /* Guest Name Styling (60px, Bold) */
         #dynamic-name {
             position: absolute;
-            top: 220px; /* Adjust based on your background design */
-            left: 50px;
-            font-size: 24px;
-            font-weight: 700;
+            top: 28%; /* Background k hisaab say adjust kar lein */
+            left: 8%; /* Background k hisaab say adjust kar lein */
+            font-size: 60px;
+            font-weight: 700; /* Bold */
             color: #000000;
         }
 
+        /* Sender Details Box */
         #dynamic-sender-box {
             position: absolute;
-            bottom: 120px; /* Adjust based on your background design */
-            left: 50px;
+            bottom: 12%; /* Background k hisaab say adjust kar lein */
+            left: 8%;
             color: #000000;
+            line-height: 1.2;
+        }
+
+        .warm-regards {
+            font-size: 40px;
+            font-weight: 400; /* Regular */
+            margin-bottom: 10px;
+        }
+
+        /* Sender Name Styling (60px, Bold) */
+        .sender-name {
+            font-size: 60px;
+            font-weight: 700; /* Bold */
+        }
+
+        /* Designation Styling (40px, Regular) */
+        .sender-title {
+            font-size: 40px;
+            font-weight: 400; /* Regular */
+        }
+
+        .sender-company {
+            font-size: 40px;
+            font-weight: 700; /* Bold */
+            margin-top: 5px;
         }
     </style>
 </head>
 <body class="p-8">
 
-    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row">
+    <div class="max-w-[1400px] mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex flex-col xl:flex-row">
         
         <!-- Left Column: Controls -->
-        <div class="w-full md:w-1/3 p-6 bg-gray-50 border-r border-gray-200">
+        <div class="w-full xl:w-1/3 p-6 bg-gray-50 border-r border-gray-200">
             <h2 class="text-2xl font-bold mb-6 text-green-700">Invite Generator</h2>
             
             <!-- Guest Name Input -->
@@ -70,57 +104,59 @@
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Send On Behalf Of</label>
                 <select id="senderSelect" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-600" onchange="updatePreview()">
-                    <option value="ceo">Naveed Godil (Chief Executive Officer)</option>
-                    <option value="cco">Khalid Mehmood (Chief Commercial Officer)</option>
+                    <option value="ceo">Naveed Godil</option>
+                    <option value="cco">Khalid Mehmood</option>
                 </select>
             </div>
 
-            <!-- WhatsApp Number (Optional for direct messaging) -->
+            <!-- WhatsApp Number -->
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Guest WhatsApp Number (with country code)</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Guest WhatsApp Number</label>
                 <input type="text" id="whatsappNumber" placeholder="e.g. 923001234567" 
                     class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
-                <p class="text-xs text-gray-500 mt-1">Leave blank to open generic WhatsApp Web.</p>
+                <p class="text-xs text-gray-500 mt-1">Country code k sath (maslan 923...)</p>
             </div>
 
             <hr class="my-6">
 
             <!-- Action Buttons -->
             <div class="flex flex-col space-y-3">
-                <button onclick="downloadInvite()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
+                <button onclick="downloadInvite()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded shadow">
                     Download Invite
                 </button>
-                <button onclick="sendWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow flex justify-center items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                <button onclick="sendWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded shadow flex justify-center items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
                     Send via WhatsApp
                 </button>
             </div>
         </div>
 
-        <!-- Right Column: Live Preview -->
-        <div class="w-full md:w-2/3 p-6 flex justify-center items-center bg-gray-200">
-            <!-- 
-              This div contains the structure. 
-              The exact text and layout is modeled after "Group 4.pdf". 
-            -->
-            <div id="invite-preview">
-                <!-- Guest Name Target -->
-                <div id="dynamic-name">Mr. Syed Athar Bukhari</div>
-                
-                <!-- Signature Target -->
-                <div id="dynamic-sender-box">
-                    <div class="font-normal text-sm mb-1">Warm regards,</div>
-                    <div id="dynamic-sender-name" class="font-bold text-xl">Naveed Godil</div>
-                    <div id="dynamic-sender-title" class="font-normal text-sm">Chief Executive Officer</div>
-                    <div class="font-bold text-sm mt-1">IPAK</div>
+        <!-- Right Column: Live Preview (Scaled for display) -->
+        <div class="w-full xl:w-2/3 p-6 flex justify-center items-center bg-gray-200 overflow-auto">
+            
+            <div class="preview-wrapper xl:scale-75 2xl:scale-100">
+                <!-- Invite Structure -->
+                <div id="invite-preview">
+                    
+                    <!-- Guest Name -->
+                    <div id="dynamic-name">Mr. Syed Athar Bukhari</div>
+                    
+                    <!-- Signature Area -->
+                    <div id="dynamic-sender-box">
+                        <div class="warm-regards">Warm regards,</div>
+                        <div id="dynamic-sender-name" class="sender-name">Naveed Godil</div>
+                        <div id="dynamic-sender-title" class="sender-title">Chief Executive Officer</div>
+                        <div class="sender-company">IPAK</div>
+                    </div>
+
                 </div>
             </div>
+
         </div>
         
     </div>
 
     <script>
-        // Data for the two senders
         const senders = {
             ceo: {
                 name: "Naveed Godil",
@@ -132,62 +168,49 @@
             }
         };
 
-        // Update the live preview as the user types or selects options
         function updatePreview() {
             const nameInput = document.getElementById('guestName').value;
             const senderSelect = document.getElementById('senderSelect').value;
 
-            // Update Name (fallback to placeholder if empty)
             document.getElementById('dynamic-name').innerText = nameInput ? nameInput : "Guest Name Here";
 
-            // Update Sender details
             document.getElementById('dynamic-sender-name').innerText = senders[senderSelect].name;
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
         }
 
-        // Generate and download the image using html2canvas
         function downloadInvite() {
             const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
+            // Generate canvas with original size (1000x1000) for good quality
             html2canvas(previewElement, { 
-                scale: 2, // High resolution
-                useCORS: true // Required if background image is hosted elsewhere
+                scale: 3, // High scale for crisp text download
+                useCORS: true 
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.png`;
-                link.href = canvas.toDataURL('image/png');
+                link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
+                // JPG use kiya gaya hai size control karne ke liye
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             });
         }
 
-        // Prepare the WhatsApp web link
         function sendWhatsApp() {
             const guestName = document.getElementById('guestName').value || 'Guest';
             const phone = document.getElementById('whatsappNumber').value;
             
-            // Craft the message
             const message = `Dear ${guestName},\n\nIt is our pleasure to invite you to an exclusive evening celebrating the relationships that inspire innovation, growth, and sustainable success at IPAK Dawat 2026.\n\nDate: 3rd September 2026\nVenue: IPAK SHEIKHUPURA PLANT\n\nPlease find your invitation attached. We look forward to hosting you!`;
             
             const encodedMessage = encodeURIComponent(message);
             
-            let whatsappUrl = '';
-            if (phone) {
-                // Direct message to a specific number
-                whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-            } else {
-                // Open WhatsApp Web and prompt user to select a contact
-                whatsappUrl = `https://web.whatsapp.com/send?text=${encodedMessage}`;
-            }
+            let whatsappUrl = phone 
+                ? `https://wa.me/${phone}?text=${encodedMessage}` 
+                : `https://web.whatsapp.com/send?text=${encodedMessage}`;
 
-            // Open in new tab
             window.open(whatsappUrl, '_blank');
-            
-            // Reminder alert for the file attachment limitation
-            alert("WhatsApp Web opened. Don't forget to click 'Download Invite' first so you can attach the generated image to the chat!");
+            alert("Download ki hui file ko WhatsApp Web ki chat mein attach karna mat bhooliye ga!");
         }
 
-        // Initialize preview on load
         updatePreview();
     </script>
 </body>

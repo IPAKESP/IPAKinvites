@@ -59,15 +59,15 @@
         .btn-whatsapp:hover { background: #15803d; }
         
         .preview-wrapper { 
-            width: 1000px; 
-            height: 1000px; 
+            width: 1024px; 
+            height: 1024px; 
             transform-origin: top left; 
             transform: scale(0.6); 
         }
 
         #invite-preview {
-            width: 1000px; 
-            height: 1000px;
+            width: 1024px; 
+            height: 1024px;
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
@@ -92,7 +92,8 @@
             line-height: 1.2;
         }
         
-        .sender-name { font-size: 30px; font-weight: bold; }
+        /* Margin-bottom yahan add kiya gaya hai */
+        .sender-name { font-size: 30px; font-weight: bold; margin-bottom: 12px; }
         .sender-title { font-size: 20px; font-weight: normal; }
         .sender-company { font-size: 40px; font-weight: bold; margin-top: 5px; }
     </style>
@@ -153,10 +154,11 @@
             const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            html2canvas(previewElement, { scale: 2, useCORS: true }).then(canvas => {
+            // Scale 4 kiya hai taa k 1024px multiply ho kar exactly 4096px ban jaye
+            html2canvas(previewElement, { scale: 4, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.href = canvas.toDataURL('image/jpeg', 1.0); // Image quality 1.0 (Highest)
                 link.click();
             });
         }

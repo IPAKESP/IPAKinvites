@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPAK Dawat 2026 - Invite Generator</title>
-    <!-- Tailwind CSS for Interface Styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <!-- html2canvas for downloading the invite -->
+    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -17,22 +17,16 @@
             background-color: #f3f4f6;
         }
         
-        /* 
-         * Preview Container Setup
-         * Dimension 1000x1000 rakhi hai taa k 60px aur 40px font size 
-         * 4096x4096 ki ratio k mutabiq properly scale aur render ho.
-         */
         .preview-wrapper {
             width: 1000px;
             height: 1000px;
-            /* Scale down for smaller screens in preview, but keeps original 1000x1000 for download */
             transform-origin: top left;
         }
 
         #invite-preview {
             width: 1000px;
             height: 1000px;
-            background-image: url('background.jpg'); 
+            background-image: url('background.jpg'); /* Yahan repo ka link bhi daal saktay hain */
             background-size: cover;
             background-position: center;
             position: relative;
@@ -40,46 +34,43 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* Guest Name Styling (60px, Bold) */
+        /* Guest Name - Size 60, Bold */
         #dynamic-name {
             position: absolute;
-            top: 28%; /* Background k hisaab say adjust kar lein */
-            left: 8%; /* Background k hisaab say adjust kar lein */
+            top: 17%; 
+            left: 12.2%; 
             font-size: 60px;
-            font-weight: 700; /* Bold */
+            font-weight: 700;
             color: #000000;
+            letter-spacing: -0.5px;
         }
 
-        /* Sender Details Box */
+        /* Sender Details Box - Positioned below printed "Warm regards," */
         #dynamic-sender-box {
             position: absolute;
-            bottom: 12%; /* Background k hisaab say adjust kar lein */
-            left: 8%;
+            top: 61.5%; 
+            left: 12.2%;
             color: #000000;
             line-height: 1.2;
         }
 
-        .warm-regards {
-            font-size: 40px;
-            font-weight: 400; /* Regular */
-            margin-bottom: 10px;
-        }
-
-        /* Sender Name Styling (60px, Bold) */
+        /* Sender Name - Size 60, Bold */
         .sender-name {
             font-size: 60px;
-            font-weight: 700; /* Bold */
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        /* Designation Styling (40px, Regular) */
+        /* Designation - Size 40, Regular */
         .sender-title {
             font-size: 40px;
-            font-weight: 400; /* Regular */
+            font-weight: 400;
         }
 
+        /* Company - Size 40, Bold */
         .sender-company {
             font-size: 40px;
-            font-weight: 700; /* Bold */
+            font-weight: 700;
             margin-top: 5px;
         }
     </style>
@@ -88,11 +79,10 @@
 
     <div class="max-w-[1400px] mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex flex-col xl:flex-row">
         
-        <!-- Left Column: Controls -->
+        <!-- Controls Panel -->
         <div class="w-full xl:w-1/3 p-6 bg-gray-50 border-r border-gray-200">
             <h2 class="text-2xl font-bold mb-6 text-green-700">Invite Generator</h2>
             
-            <!-- Guest Name Input -->
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Guest Name</label>
                 <input type="text" id="guestName" placeholder="e.g. Mr. Syed Athar Bukhari" 
@@ -100,7 +90,6 @@
                     onkeyup="updatePreview()">
             </div>
 
-            <!-- Sender Selection -->
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Send On Behalf Of</label>
                 <select id="senderSelect" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-600" onchange="updatePreview()">
@@ -109,7 +98,6 @@
                 </select>
             </div>
 
-            <!-- WhatsApp Number -->
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Guest WhatsApp Number</label>
                 <input type="text" id="whatsappNumber" placeholder="e.g. 923001234567" 
@@ -119,7 +107,6 @@
 
             <hr class="my-6">
 
-            <!-- Action Buttons -->
             <div class="flex flex-col space-y-3">
                 <button onclick="downloadInvite()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded shadow">
                     Download Invite
@@ -131,19 +118,14 @@
             </div>
         </div>
 
-        <!-- Right Column: Live Preview (Scaled for display) -->
+        <!-- Live Preview -->
         <div class="w-full xl:w-2/3 p-6 flex justify-center items-center bg-gray-200 overflow-auto">
-            
             <div class="preview-wrapper xl:scale-75 2xl:scale-100">
-                <!-- Invite Structure -->
                 <div id="invite-preview">
                     
-                    <!-- Guest Name -->
                     <div id="dynamic-name">Mr. Syed Athar Bukhari</div>
                     
-                    <!-- Signature Area -->
                     <div id="dynamic-sender-box">
-                        <div class="warm-regards">Warm regards,</div>
                         <div id="dynamic-sender-name" class="sender-name">Naveed Godil</div>
                         <div id="dynamic-sender-title" class="sender-title">Chief Executive Officer</div>
                         <div class="sender-company">IPAK</div>
@@ -151,7 +133,6 @@
 
                 </div>
             </div>
-
         </div>
         
     </div>
@@ -173,7 +154,6 @@
             const senderSelect = document.getElementById('senderSelect').value;
 
             document.getElementById('dynamic-name').innerText = nameInput ? nameInput : "Guest Name Here";
-
             document.getElementById('dynamic-sender-name').innerText = senders[senderSelect].name;
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
         }
@@ -182,14 +162,12 @@
             const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            // Generate canvas with original size (1000x1000) for good quality
             html2canvas(previewElement, { 
-                scale: 3, // High scale for crisp text download
+                scale: 3, 
                 useCORS: true 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                // JPG use kiya gaya hai size control karne ke liye
                 link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             });
@@ -208,7 +186,6 @@
                 : `https://web.whatsapp.com/send?text=${encodedMessage}`;
 
             window.open(whatsappUrl, '_blank');
-            alert("Download ki hui file ko WhatsApp Web ki chat mein attach karna mat bhooliye ga!");
         }
 
         updatePreview();

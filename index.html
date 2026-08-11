@@ -56,8 +56,6 @@
         }
         .btn-download { background: #2563eb; }
         .btn-download:hover { background: #1d4ed8; }
-        .btn-whatsapp { background: #16a34a; }
-        .btn-whatsapp:hover { background: #15803d; }
         
         .preview-wrapper { 
             width: 1024px; 
@@ -73,7 +71,7 @@
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
-            background-color: #ffffff; /* White background fix */
+            background-color: #ffffff; 
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
@@ -112,14 +110,9 @@
             <option value="cco">Khalid Mehmood</option>
         </select>
 
-        <label>Guest WhatsApp Number</label>
-        <input type="text" id="whatsappNumber" placeholder="e.g. 923001234567">
-        <small style="color: #6b7280; display: block; margin-top: 4px;">Country code k sath (maslan 923...)</small>
-
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
 
         <button onclick="downloadInvite()" class="btn-download">Download Invite</button>
-        <button onclick="sendWhatsApp()" class="btn-whatsapp">Send via WhatsApp</button>
     </div>
 
     <div class="preview-container">
@@ -155,16 +148,15 @@
             const original = document.getElementById('invite-preview');
             const clone = original.cloneNode(true);
             
-            // 4K Clone Setup Fixes
             clone.style.width = '4096px';
             clone.style.height = '4096px';
-            clone.style.position = 'fixed'; // Fixed instead of absolute avoids scroll bugs
-            clone.style.left = '200vw'; // Hide far right
+            clone.style.position = 'fixed'; 
+            clone.style.left = '200vw'; 
             clone.style.top = '0';
             clone.style.zIndex = '-9999';
             clone.style.transform = 'none'; 
-            clone.style.boxShadow = 'none'; // DARK SHADE FIX: Remove shadow on download
-            clone.style.backgroundColor = '#ffffff'; // DARK BACKGROUND FIX
+            clone.style.boxShadow = 'none'; 
+            clone.style.backgroundColor = '#ffffff'; 
             
             clone.querySelector('.guest-name-text').style.fontSize = '120px';
             clone.querySelector('.sender-name-text').style.fontSize = '120px';
@@ -177,9 +169,9 @@
                 scale: 1, 
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff', // Force white background
-                scrollX: 0, // SCROLL BUG FIX
-                scrollY: 0  // SCROLL BUG FIX
+                backgroundColor: '#ffffff', 
+                scrollX: 0, 
+                scrollY: 0  
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
@@ -188,19 +180,6 @@
                 
                 document.body.removeChild(clone);
             });
-        }
-
-        function sendWhatsApp() {
-            const guestName = document.getElementById('guestName').value || 'Guest';
-            const phone = document.getElementById('whatsappNumber').value;
-            
-            const message = `Dear ${guestName},\n\nIt is our pleasure to invite you to an exclusive evening celebrating the relationships that inspire innovation, growth, and sustainable success at IPAK Dawat 2026.\n\nDate: 3rd September 2026\nVenue: IPAK SHEIKHUPURA PLANT\n\nPlease find your invitation attached. We look forward to hosting you!`;
-            
-            let whatsappUrl = phone 
-                ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}` 
-                : `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-
-            window.open(whatsappUrl, '_blank');
         }
 
         updatePreview();

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPAK Dawat 2026 - Invite Generator</title>
     
+    <!-- Download tool -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -34,10 +35,8 @@
             flex-grow: 1; 
             display: flex; 
             justify-content: center; 
-            /* Hide scrollbars during the split-second download scale */
             overflow: hidden; 
             min-width: 300px;
-            height: 800px; /* fixed height taa k layout na hilay */
         }
         
         h2 { color: #15803d; margin-top: 0; }
@@ -60,36 +59,36 @@
         .btn-whatsapp { background: #16a34a; }
         .btn-whatsapp:hover { background: #15803d; }
         
-        /* TRUE 4K SETUP */
+        /* Screen Layout: 1024px ko chota dikhane k liye scale kiya hai */
         .preview-wrapper { 
-            width: 4096px; 
-            height: 4096px; 
-            transform-origin: top left; 
-            /* Screen par fit karne k liye scale */
-            transform: scale(0.18); 
+            width: 1024px; 
+            height: 1024px; 
+            transform-origin: top center; 
+            transform: scale(0.6); 
+            margin-bottom: -400px; /* Space fix */
         }
 
         #invite-preview {
-            width: 4096px; 
-            height: 4096px;
+            width: 1024px; 
+            height: 1024px;
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
             background-color: white;
-            text-rendering: optimizeLegibility;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
-        /* Fonts multiplied by 4 to match 4096 resolution */
-        #dynamic-name { 
+        /* Screen Fonts (inhein hum code k zariye download k waqt bara kareingay) */
+        .guest-name-text { 
             position: absolute; 
             top: 15%; 
             left: 12.2%; 
-            font-size: 120px; 
+            font-size: 30px; 
             font-weight: bold; 
             color: black; 
         }
         
-        #dynamic-sender-box { 
+        .sender-box { 
             position: absolute; 
             top: 61.5%; 
             left: 12.2%; 
@@ -97,9 +96,8 @@
             line-height: 1.2;
         }
         
-        .sender-name { font-size: 120px; font-weight: bold; margin-bottom: 20px; }
-        .sender-title { font-size: 80px; font-weight: normal; }
-        .sender-company { font-size: 160px; font-weight: bold; margin-top: 20px; }
+        .sender-name-text { font-size: 30px; font-weight: bold; margin-bottom: 5px; }
+        .sender-title-text { font-size: 20px; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -126,14 +124,14 @@
         <button onclick="sendWhatsApp()" class="btn-whatsapp">Send via WhatsApp</button>
     </div>
 
+    <!-- Live Preview -->
     <div class="preview-container">
-        <div class="preview-wrapper" id="p-wrapper">
+        <div class="preview-wrapper">
             <div id="invite-preview">
-                <div id="dynamic-name">Mr. Syed Athar Bukhari</div>
-                <div id="dynamic-sender-box">
-                    <div id="dynamic-sender-name" class="sender-name">Naveed Godil</div>
-                    <div id="dynamic-sender-title" class="sender-title">Chief Executive Officer</div>
-                    <div class="sender-company"></div>
+                <div class="guest-name-text" id="dynamic-name">Mr. Syed Athar Bukhari</div>
+                <div class="sender-box">
+                    <div class="sender-name-text" id="dynamic-sender-name">Naveed Godil</div>
+                    <div class="sender-title-text" id="dynamic-sender-title">Chief Executive Officer</div>
                 </div>
             </div>
         </div>
@@ -154,26 +152,43 @@
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
         }
 
+        // PERFECT 4K GHOST DOWNLOAD METHOD
         function downloadInvite() {
-            const wrapper = document.getElementById('p-wrapper');
-            const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            // Temporary scale removal so tool captures the raw 4096x4096 resolution
-            wrapper.style.transform = 'scale(1)';
+            // 1. Original design ki ek chupi hui copy banayein
+            const original = document.getElementById('invite-preview');
+            const clone = original.cloneNode(true);
             
-            html2canvas(previewElement, { 
-                scale: 1, // original 1:1 scale
+            // 2. Clone ko EXACTLY 4096px karein aur screen k bahir chupayein
+            clone.style.width = '4096px';
+            clone.style.height = '4096px';
+            clone.style.position = 'absolute';
+            clone.style.left = '-9999px'; 
+            clone.style.top = '0';
+            clone.style.transform = 'none'; // Overlap maslay ka hal
+            
+            // 3. Fonts ko theek 4 guna bada karein (4096 ratio k hisaab say)
+            clone.querySelector('.guest-name-text').style.fontSize = '120px';
+            clone.querySelector('.sender-name-text').style.fontSize = '120px';
+            clone.querySelector('.sender-name-text').style.marginBottom = '20px';
+            clone.querySelector('.sender-title-text').style.fontSize = '80px';
+            
+            document.body.appendChild(clone);
+            
+            // 4. Sirf Clone ka screenshot lein
+            html2canvas(clone, { 
+                scale: 1, 
                 useCORS: true,
                 logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.href = canvas.toDataURL('image/jpeg', 1.0); // Highest Quality
                 link.click();
                 
-                // Return to screen scale
-                wrapper.style.transform = 'scale(0.18)';
+                // 5. Download k baad chupi hui copy ura dein
+                document.body.removeChild(clone);
             });
         }
 
@@ -190,6 +205,7 @@
             window.open(whatsappUrl, '_blank');
         }
 
+        // Shuru mein update chala dein
         updatePreview();
     </script>
 </body>

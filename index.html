@@ -62,7 +62,7 @@
             width: 1024px; 
             height: 1024px; 
             transform-origin: top left; 
-            transform: scale(0.6); 
+            transform: scale(0.6); /* Default screen scale */
         }
 
         #invite-preview {
@@ -73,6 +73,7 @@
             position: relative; 
             background-color: white;
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            text-rendering: optimizeLegibility; /* Text quality fix */
         }
 
         #dynamic-name { 
@@ -82,6 +83,7 @@
             font-size: 30px; 
             font-weight: bold; 
             color: black; 
+            letter-spacing: normal;
         }
         
         #dynamic-sender-box { 
@@ -90,9 +92,9 @@
             left: 12.2%; 
             color: black; 
             line-height: 1.2;
+            letter-spacing: normal;
         }
         
-        /* Margin-bottom 12px say kam kar k 5px kar diya hai */
         .sender-name { font-size: 30px; font-weight: bold; margin-bottom: 5px; }
         .sender-title { font-size: 20px; font-weight: normal; }
         .sender-company { font-size: 40px; font-weight: bold; margin-top: 5px; }
@@ -123,7 +125,7 @@
     </div>
 
     <div class="preview-container">
-        <div class="preview-wrapper">
+        <div class="preview-wrapper" id="p-wrapper">
             <div id="invite-preview">
                 <div id="dynamic-name">Mr. Syed Athar Bukhari</div>
                 <div id="dynamic-sender-box">
@@ -151,14 +153,25 @@
         }
 
         function downloadInvite() {
+            const wrapper = document.getElementById('p-wrapper');
             const previewElement = document.getElementById('invite-preview');
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            html2canvas(previewElement, { scale: 4, useCORS: true }).then(canvas => {
+            // BUG FIX: Temporarily remove the scale to let html2canvas calculate correct text spacing
+            wrapper.style.transform = 'scale(1)';
+            
+            // Ensure 4096x4096 resolution (1024 x 4 = 4096)
+            html2canvas(previewElement, { 
+                scale: 4, 
+                useCORS: true 
+            }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 1.0);
                 link.click();
+                
+                // Put the scale back so the layout stays correct on screen
+                wrapper.style.transform = 'scale(0.6)';
             });
         }
 

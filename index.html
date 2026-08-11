@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPAK Dawat 2026 - Invite Generator</title>
-    <!-- Sirf Download tool k liye internet chahiye -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* Sadi aur tez CSS (Bina kisi external link k) */
         body { 
             font-family: Arial, sans-serif; 
             background: #f3f4f6; 
@@ -59,19 +58,16 @@
         .btn-whatsapp { background: #16a34a; }
         .btn-whatsapp:hover { background: #15803d; }
         
-        /* Preview area styling */
         .preview-wrapper { 
             width: 1000px; 
             height: 1000px; 
             transform-origin: top left; 
-            /* Choti screen pay chota dikhanay k liye scale */
             transform: scale(0.6); 
         }
 
         #invite-preview {
             width: 1000px; 
             height: 1000px;
-            /* Yahan background.jpg load hogi */
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
@@ -79,7 +75,6 @@
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
-        /* Text Styling */
         #dynamic-name { 
             position: absolute; 
             top: 17%; 
@@ -104,7 +99,6 @@
 </head>
 <body>
 
-    <!-- Left Side: Controls -->
     <div class="controls">
         <h2>Invite Generator</h2>
         
@@ -127,7 +121,6 @@
         <button onclick="sendWhatsApp()" class="btn-whatsapp">Send via WhatsApp</button>
     </div>
 
-    <!-- Right Side: Live Preview -->
     <div class="preview-container">
         <div class="preview-wrapper">
             <div id="invite-preview">

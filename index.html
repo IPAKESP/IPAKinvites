@@ -59,13 +59,12 @@
         .btn-whatsapp { background: #16a34a; }
         .btn-whatsapp:hover { background: #15803d; }
         
-        /* Screen Layout: 1024px ko chota dikhane k liye scale kiya hai */
         .preview-wrapper { 
             width: 1024px; 
             height: 1024px; 
             transform-origin: top center; 
             transform: scale(0.6); 
-            margin-bottom: -400px; /* Space fix */
+            margin-bottom: -400px; 
         }
 
         #invite-preview {
@@ -74,11 +73,10 @@
             background-image: url('background.jpg');
             background-size: cover; 
             position: relative; 
-            background-color: white;
+            background-color: #ffffff; /* White background fix */
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
-        /* Screen Fonts (inhein hum code k zariye download k waqt bara kareingay) */
         .guest-name-text { 
             position: absolute; 
             top: 15%; 
@@ -124,7 +122,6 @@
         <button onclick="sendWhatsApp()" class="btn-whatsapp">Send via WhatsApp</button>
     </div>
 
-    <!-- Live Preview -->
     <div class="preview-container">
         <div class="preview-wrapper">
             <div id="invite-preview">
@@ -152,23 +149,23 @@
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
         }
 
-        // PERFECT 4K GHOST DOWNLOAD METHOD
         function downloadInvite() {
             const guestName = document.getElementById('guestName').value || 'Guest';
             
-            // 1. Original design ki ek chupi hui copy banayein
             const original = document.getElementById('invite-preview');
             const clone = original.cloneNode(true);
             
-            // 2. Clone ko EXACTLY 4096px karein aur screen k bahir chupayein
+            // 4K Clone Setup Fixes
             clone.style.width = '4096px';
             clone.style.height = '4096px';
-            clone.style.position = 'absolute';
-            clone.style.left = '-9999px'; 
+            clone.style.position = 'fixed'; // Fixed instead of absolute avoids scroll bugs
+            clone.style.left = '200vw'; // Hide far right
             clone.style.top = '0';
-            clone.style.transform = 'none'; // Overlap maslay ka hal
+            clone.style.zIndex = '-9999';
+            clone.style.transform = 'none'; 
+            clone.style.boxShadow = 'none'; // DARK SHADE FIX: Remove shadow on download
+            clone.style.backgroundColor = '#ffffff'; // DARK BACKGROUND FIX
             
-            // 3. Fonts ko theek 4 guna bada karein (4096 ratio k hisaab say)
             clone.querySelector('.guest-name-text').style.fontSize = '120px';
             clone.querySelector('.sender-name-text').style.fontSize = '120px';
             clone.querySelector('.sender-name-text').style.marginBottom = '20px';
@@ -176,18 +173,19 @@
             
             document.body.appendChild(clone);
             
-            // 4. Sirf Clone ka screenshot lein
             html2canvas(clone, { 
                 scale: 1, 
                 useCORS: true,
-                logging: false
+                logging: false,
+                backgroundColor: '#ffffff', // Force white background
+                scrollX: 0, // SCROLL BUG FIX
+                scrollY: 0  // SCROLL BUG FIX
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 1.0); // Highest Quality
+                link.href = canvas.toDataURL('image/jpeg', 1.0); 
                 link.click();
                 
-                // 5. Download k baad chupi hui copy ura dein
                 document.body.removeChild(clone);
             });
         }
@@ -205,7 +203,6 @@
             window.open(whatsappUrl, '_blank');
         }
 
-        // Shuru mein update chala dein
         updatePreview();
     </script>
 </body>

@@ -66,6 +66,7 @@
         }
         .btn-download { background: #2563eb; }
         .btn-download:hover { background: #1d4ed8; }
+        .btn-download:disabled { background: #94a3b8; cursor: not-allowed; }
         
         /* Auto-sizing Wrapper */
         .preview-wrapper { 
@@ -128,7 +129,7 @@
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
 
-        <button onclick="downloadInvite()" class="btn-download">Download Invite</button>
+        <button onclick="downloadInvite()" class="btn-download" id="downloadBtn">Download Invite</button>
     </div>
 
     <div class="preview-container">
@@ -149,19 +150,17 @@
             cco: { name: "Khalid Mehmood", title: "Chief Commercial Officer" }
         };
 
-        // Yeh function screen ka size measure kar ke card ko exact fit karta hai
+        // Screen size ke hisaab se card ko perfect fit karne ka function
         function adjustScale() {
             const wrapper = document.getElementById('preview-wrapper');
             const preview = document.getElementById('invite-preview');
             
             if(wrapper && preview) {
-                // Wrapper ki width nikal kar 1024 pe divide karega, taake perfect scale mil sake
                 const scale = wrapper.clientWidth / 1024;
                 preview.style.transform = `scale(${scale})`;
             }
         }
 
-        // Jab page load ho ya screen resize/rotate ho to automatically adjust kare
         window.addEventListener('resize', adjustScale);
         window.addEventListener('load', adjustScale);
 
@@ -173,47 +172,54 @@
             document.getElementById('dynamic-sender-name').innerText = senders[senderSelect].name;
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
             
-            adjustScale(); // Har update pe layout fit check karega
+            adjustScale(); 
         }
 
         function downloadInvite() {
+            // Button ko disable karein taake double click na ho
+            const btn = document.getElementById('downloadBtn');
+            btn.innerText = "Downloading...";
+            btn.disabled = true;
+
             const guestName = document.getElementById('guestName').value || 'Guest';
-            
             const original = document.getElementById('invite-preview');
+            
+            // Background copy banayen 
             const clone = original.cloneNode(true);
             
-            // Background me image ko 4K ready karne ke settings
-            clone.style.transform = 'none';
-            clone.style.width = '4096px';
-            clone.style.height = '4096px';
-            clone.style.position = 'fixed'; 
-            clone.style.left = '200vw'; 
+            // Sirf 1024px ka size rakhein aur html2canvas se HD render lenge
+            clone.style.transform = 'none'; 
+            clone.style.width = '1024px';
+            clone.style.height = '1024px';
+            clone.style.position = 'absolute'; 
+            clone.style.left = '-9999px'; // Screen se bahar rakhein
             clone.style.top = '0';
-            clone.style.zIndex = '-9999';
-            clone.style.boxShadow = 'none'; 
-            clone.style.backgroundColor = '#ffffff'; 
-            
-            clone.querySelector('.guest-name-text').style.fontSize = '120px';
-            clone.querySelector('.sender-name-text').style.fontSize = '120px';
-            clone.querySelector('.sender-name-text').style.marginBottom = '20px';
-            clone.querySelector('.sender-title-text').style.fontSize = '80px';
+            clone.style.boxShadow = 'none';
             
             document.body.appendChild(clone);
             
+            // html2canvas settings - scale: 2 (2048x2048 HD output)
             html2canvas(clone, { 
-                scale: 1, 
+                scale: 2, 
                 useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff', 
-                scrollX: 0, 
-                scrollY: 0  
+                allowTaint: true,
+                backgroundColor: '#ffffff'
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 1.0); 
+                link.href = canvas.toDataURL('image/jpeg', 0.9); // Quality set to 90%
                 link.click();
                 
+                // Process mukammal hone ke baad saaf kar dein
                 document.body.removeChild(clone);
+                btn.innerText = "Download Invite";
+                btn.disabled = false;
+            }).catch(err => {
+                console.error("Download Error:", err);
+                alert("Error: Download fail ho gaya. Kripya check karein ke background image ('background.jpg') sahi folder me mojood hai aur aap local server use kar rahay hain.");
+                document.body.removeChild(clone);
+                btn.innerText = "Download Invite";
+                btn.disabled = false;
             });
         }
 

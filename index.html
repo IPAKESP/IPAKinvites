@@ -39,17 +39,14 @@
         
         .preview-container { 
             background: #e5e7eb; 
-            padding: 15px; 
+            padding: 20px; 
             border-radius: 8px; 
             flex-grow: 1; 
             display: flex; 
             justify-content: center; 
             align-items: center;
-            overflow-x: auto; /* Allows smooth horizontal scrolling if card is wider than screen */
-            overflow-y: hidden;
             width: 100%;
             box-sizing: border-box;
-            -webkit-overflow-scrolling: touch;
         }
         
         h2 { color: #15803d; margin-top: 0; }
@@ -70,23 +67,28 @@
         .btn-download { background: #2563eb; }
         .btn-download:hover { background: #1d4ed8; }
         
+        /* Auto-sizing Wrapper */
         .preview-wrapper { 
-            width: 614px; /* 1024 * 0.6 scale for perfect readability */
-            height: 614px; 
-            flex-shrink: 0;
-            margin: auto;
+            width: 100%; 
+            max-width: 500px; /* Desktop par buhat bada na ho */
+            aspect-ratio: 1 / 1; /* Perfect square rakhega */
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
+        /* Actual 1024x1024 Canvas (Scaled down dynamically via JS) */
         #invite-preview {
             width: 1024px; 
             height: 1024px;
             background-image: url('background.jpg');
             background-size: cover; 
-            position: relative; 
+            position: absolute; 
+            top: 0;
+            left: 0;
             background-color: #ffffff; 
-            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
             transform-origin: top left;
-            transform: scale(0.6); /* Keeps text sharp and readable */
         }
 
         .guest-name-text { 
@@ -130,7 +132,7 @@
     </div>
 
     <div class="preview-container">
-        <div class="preview-wrapper">
+        <div class="preview-wrapper" id="preview-wrapper">
             <div id="invite-preview">
                 <div class="guest-name-text" id="dynamic-name">Mr. Syed Athar Bukhari</div>
                 <div class="sender-box">
@@ -147,6 +149,22 @@
             cco: { name: "Khalid Mehmood", title: "Chief Commercial Officer" }
         };
 
+        // Yeh function screen ka size measure kar ke card ko exact fit karta hai
+        function adjustScale() {
+            const wrapper = document.getElementById('preview-wrapper');
+            const preview = document.getElementById('invite-preview');
+            
+            if(wrapper && preview) {
+                // Wrapper ki width nikal kar 1024 pe divide karega, taake perfect scale mil sake
+                const scale = wrapper.clientWidth / 1024;
+                preview.style.transform = `scale(${scale})`;
+            }
+        }
+
+        // Jab page load ho ya screen resize/rotate ho to automatically adjust kare
+        window.addEventListener('resize', adjustScale);
+        window.addEventListener('load', adjustScale);
+
         function updatePreview() {
             const nameInput = document.getElementById('guestName').value;
             const senderSelect = document.getElementById('senderSelect').value;
@@ -154,6 +172,8 @@
             document.getElementById('dynamic-name').innerText = nameInput ? nameInput : "Guest Name Here";
             document.getElementById('dynamic-sender-name').innerText = senders[senderSelect].name;
             document.getElementById('dynamic-sender-title').innerText = senders[senderSelect].title;
+            
+            adjustScale(); // Har update pe layout fit check karega
         }
 
         function downloadInvite() {
@@ -162,7 +182,7 @@
             const original = document.getElementById('invite-preview');
             const clone = original.cloneNode(true);
             
-            // Reset preview scaling transforms for crisp full-resolution 4K render
+            // Background me image ko 4K ready karne ke settings
             clone.style.transform = 'none';
             clone.style.width = '4096px';
             clone.style.height = '4096px';

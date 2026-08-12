@@ -13,30 +13,41 @@
             font-family: Arial, sans-serif; 
             background: #f3f4f6; 
             margin: 0; 
-            padding: 20px; 
+            padding: 15px; 
             display: flex; 
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 20px; 
+        }
+
+        @media(min-width: 900px) {
+            body {
+                flex-direction: row;
+                padding: 20px;
+            }
         }
         
         .controls { 
             background: white; 
             padding: 20px; 
             border-radius: 8px; 
-            width: 320px; 
+            width: 100%;
+            max-width: 320px;
+            box-sizing: border-box;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
             height: fit-content;
         }
         
         .preview-container { 
             background: #e5e7eb; 
-            padding: 20px; 
+            padding: 15px; 
             border-radius: 8px; 
             flex-grow: 1; 
             display: flex; 
             justify-content: center; 
+            align-items: center;
             overflow: hidden; 
-            min-width: 300px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         h2 { color: #15803d; margin-top: 0; }
@@ -61,8 +72,7 @@
             width: 1024px; 
             height: 1024px; 
             transform-origin: top center; 
-            transform: scale(0.6); 
-            margin-bottom: -400px; 
+            /* Will be dynamically scaled via JS for mobile friendliness */
         }
 
         #invite-preview {
@@ -115,8 +125,8 @@
         <button onclick="downloadInvite()" class="btn-download">Download Invite</button>
     </div>
 
-    <div class="preview-container">
-        <div class="preview-wrapper">
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-wrapper" id="previewWrapper">
             <div id="invite-preview">
                 <div class="guest-name-text" id="dynamic-name">Mr. Syed Athar Bukhari</div>
                 <div class="sender-box">
@@ -133,6 +143,34 @@
             cco: { name: "Khalid Mehmood", title: "Chief Commercial Officer" }
         };
 
+        function scalePreview() {
+            const container = document.getElementById('previewContainer');
+            const wrapper = document.getElementById('previewWrapper');
+            
+            // Get available width inside the container minus padding
+            const containerWidth = container.clientWidth - 30;
+            const nativeWidth = 1024;
+            
+            // Calculate scale ratio based on screen size
+            let scale = containerWidth / nativeWidth;
+            if (scale > 1) scale = 1; // Don't scale up past original size on large monitors
+            
+            wrapper.style.transform = `scale(${scale})`;
+            wrapper.style.height = `${1024 * scale}px`;
+            wrapper.style.width = `${1024 * scale}px`;
+            
+            // Adjust inner element sizing wrapper layout space
+            const innerPreview = document.getElementById('invite-preview');
+            innerPreview.style.transformOrigin = 'top left';
+            innerPreview.style.transform = `scale(${scale})`;
+            wrapper.style.width = `${1024 * scale}px`;
+            wrapper.style.height = `${1024 * scale}px`;
+        }
+
+        // Run scale calculation on load and resize
+        window.addEventListener('resize', scalePreview);
+        window.addEventListener('load', scalePreview);
+
         function updatePreview() {
             const nameInput = document.getElementById('guestName').value;
             const senderSelect = document.getElementById('senderSelect').value;
@@ -148,13 +186,14 @@
             const original = document.getElementById('invite-preview');
             const clone = original.cloneNode(true);
             
+            // Reset transforms on clone for crisp 4K capture
+            clone.style.transform = 'none';
             clone.style.width = '4096px';
             clone.style.height = '4096px';
             clone.style.position = 'fixed'; 
             clone.style.left = '200vw'; 
             clone.style.top = '0';
             clone.style.zIndex = '-9999';
-            clone.style.transform = 'none'; 
             clone.style.boxShadow = 'none'; 
             clone.style.backgroundColor = '#ffffff'; 
             

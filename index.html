@@ -92,7 +92,6 @@
             overflow: hidden;
         }
 
-        /* Naya Background Image Style */
         .bg-img {
             position: absolute;
             top: 0;
@@ -100,7 +99,8 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 1; /* Sabse peechay */
+            z-index: 1;
+            image-rendering: high-quality; /* Browser ko best quality render karne ka command */
         }
 
         .guest-name-text { 
@@ -110,7 +110,7 @@
             font-size: 30px; 
             font-weight: bold; 
             color: black; 
-            z-index: 10; /* Image ke upar */
+            z-index: 10; 
         }
         
         .sender-box { 
@@ -119,7 +119,7 @@
             left: 12.2%; 
             color: black; 
             line-height: 1.2;
-            z-index: 10; /* Image ke upar */
+            z-index: 10; 
         }
         
         .sender-name-text { font-size: 30px; font-weight: bold; margin-bottom: 5px; }
@@ -148,9 +148,7 @@
     <div class="preview-container">
         <div class="preview-wrapper" id="preview-wrapper">
             <div id="invite-preview">
-                <!-- Background image ab img tag se aa rahi hai jo quality lose nahi karegi -->
                 <img src="background.jpg" class="bg-img" alt="Background">
-                
                 <div class="guest-name-text" id="dynamic-name">Mr. Syed Athar Bukhari</div>
                 <div class="sender-box">
                     <div class="sender-name-text" id="dynamic-sender-name">Naveed Godil</div>
@@ -200,21 +198,31 @@
             
             const clone = original.cloneNode(true);
             
+            // Yahan hum card ko direct 4096px pe set kar rahe hain (True 4K Scale)
             clone.style.transform = 'none'; 
-            clone.style.width = '1024px';
-            clone.style.height = '1024px';
+            clone.style.width = '4096px';
+            clone.style.height = '4096px';
             clone.style.position = 'absolute'; 
             clone.style.left = '-9999px'; 
             clone.style.top = '0';
             clone.style.boxShadow = 'none';
             
+            // Fonts ko 4 gina bada kar diya taake wo 4096px ke card mein chote na lagain
+            clone.querySelector('.guest-name-text').style.fontSize = '120px'; // 30 * 4
+            clone.querySelector('.sender-name-text').style.fontSize = '120px'; // 30 * 4
+            clone.querySelector('.sender-name-text').style.marginBottom = '20px';
+            clone.querySelector('.sender-title-text').style.fontSize = '80px'; // 20 * 4
+            
             document.body.appendChild(clone);
             
+            // Scale 1 rakha hai, kyunke box already 4096px ka ho chuka hai
             html2canvas(clone, { 
-                scale: 4, 
+                scale: 1, 
                 useCORS: true,
                 allowTaint: true,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                windowWidth: 4096, // Forces canvas to render at full width
+                windowHeight: 4096
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;

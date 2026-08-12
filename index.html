@@ -100,7 +100,7 @@
             height: 100%;
             object-fit: cover;
             z-index: 1;
-            image-rendering: high-quality; /* Browser ko best quality render karne ka command */
+            image-rendering: high-quality;
         }
 
         .guest-name-text { 
@@ -190,53 +190,68 @@
 
         function downloadInvite() {
             const btn = document.getElementById('downloadBtn');
-            btn.innerText = "Downloading...";
+            btn.innerText = "Processing...";
             btn.disabled = true;
 
             const guestName = document.getElementById('guestName').value || 'Guest';
             const original = document.getElementById('invite-preview');
             
+            // Check if user is on mobile
+            const isMobile = window.innerWidth <= 768;
+            
+            // Mobile ke liye 2x (2048px), Desktop ke liye 4x (4096px)
+            const multiplier = isMobile ? 2 : 4; 
+            const finalSize = 1024 * multiplier;
+
             const clone = original.cloneNode(true);
             
-            // Yahan hum card ko direct 4096px pe set kar rahe hain (True 4K Scale)
             clone.style.transform = 'none'; 
-            clone.style.width = '4096px';
-            clone.style.height = '4096px';
+            clone.style.width = `${finalSize}px`;
+            clone.style.height = `${finalSize}px`;
             clone.style.position = 'absolute'; 
             clone.style.left = '-9999px'; 
             clone.style.top = '0';
             clone.style.boxShadow = 'none';
             
-            // Fonts ko 4 gina bada kar diya taake wo 4096px ke card mein chote na lagain
-            clone.querySelector('.guest-name-text').style.fontSize = '120px'; // 30 * 4
-            clone.querySelector('.sender-name-text').style.fontSize = '120px'; // 30 * 4
-            clone.querySelector('.sender-name-text').style.marginBottom = '20px';
-            clone.querySelector('.sender-title-text').style.fontSize = '80px'; // 20 * 4
+            // Font sizes ko multiplier ke hisab se bara karein
+            clone.querySelector('.guest-name-text').style.fontSize = `${30 * multiplier}px`; 
+            clone.querySelector('.sender-name-text').style.fontSize = `${30 * multiplier}px`; 
+            clone.querySelector('.sender-name-text').style.marginBottom = `${5 * multiplier}px`;
+            clone.querySelector('.sender-title-text').style.fontSize = `${20 * multiplier}px`; 
             
             document.body.appendChild(clone);
             
-            // Scale 1 rakha hai, kyunke box already 4096px ka ho chuka hai
             html2canvas(clone, { 
                 scale: 1, 
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff',
-                windowWidth: 4096, // Forces canvas to render at full width
-                windowHeight: 4096
+                windowWidth: finalSize,
+                windowHeight: finalSize
             }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
+                // Mobile crash rokne ke liye "Blob" method ka istemal
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
+                    
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.click();
+                    
+                    // Memory free karein
+                    URL.revokeObjectURL(url);
+                    document.body.removeChild(clone);
+                    
+                    btn.innerText = "Download Invite";
+                    btn.disabled = false;
+                }, 'image/jpeg', 0.95); // 95% quality for perfect balance
                 
-                link.href = canvas.toDataURL('image/jpeg', 1.0); 
-                link.click();
-                
-                document.body.removeChild(clone);
-                btn.innerText = "Download Invite";
-                btn.disabled = false;
             }).catch(err => {
                 console.error("Download Error:", err);
-                alert("Error: Download fail ho gaya.");
-                document.body.removeChild(clone);
+                alert("Error: Download fail ho gaya. Storage permission ya memory ka masla ho sakta hai.");
+                if(document.body.contains(clone)) {
+                    document.body.removeChild(clone);
+                }
                 btn.innerText = "Download Invite";
                 btn.disabled = false;
             });

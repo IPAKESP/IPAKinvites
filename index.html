@@ -72,25 +72,35 @@
         /* Auto-sizing Wrapper */
         .preview-wrapper { 
             width: 100%; 
-            max-width: 500px; /* Desktop par buhat bada na ho */
-            aspect-ratio: 1 / 1; /* Perfect square rakhega */
+            max-width: 500px; 
+            aspect-ratio: 1 / 1; 
             position: relative;
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 10px 15px rgba(0,0,0,0.2);
         }
 
-        /* Actual 1024x1024 Canvas (Scaled down dynamically via JS) */
+        /* Actual 1024x1024 Canvas */
         #invite-preview {
             width: 1024px; 
             height: 1024px;
-            background-image: url('background.jpg');
-            background-size: cover; 
             position: absolute; 
             top: 0;
             left: 0;
             background-color: #ffffff; 
             transform-origin: top left;
+            overflow: hidden;
+        }
+
+        /* Naya Background Image Style */
+        .bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1; /* Sabse peechay */
         }
 
         .guest-name-text { 
@@ -100,6 +110,7 @@
             font-size: 30px; 
             font-weight: bold; 
             color: black; 
+            z-index: 10; /* Image ke upar */
         }
         
         .sender-box { 
@@ -108,6 +119,7 @@
             left: 12.2%; 
             color: black; 
             line-height: 1.2;
+            z-index: 10; /* Image ke upar */
         }
         
         .sender-name-text { font-size: 30px; font-weight: bold; margin-bottom: 5px; }
@@ -136,6 +148,9 @@
     <div class="preview-container">
         <div class="preview-wrapper" id="preview-wrapper">
             <div id="invite-preview">
+                <!-- Background image ab img tag se aa rahi hai jo quality lose nahi karegi -->
+                <img src="background.jpg" class="bg-img" alt="Background">
+                
                 <div class="guest-name-text" id="dynamic-name">Mr. Syed Athar Bukhari</div>
                 <div class="sender-box">
                     <div class="sender-name-text" id="dynamic-sender-name">Naveed Godil</div>
@@ -151,7 +166,6 @@
             cco: { name: "Khalid Mehmood", title: "Chief Commercial Officer" }
         };
 
-        // Screen size ke hisaab se card ko perfect fit karne ka function
         function adjustScale() {
             const wrapper = document.getElementById('preview-wrapper');
             const preview = document.getElementById('invite-preview');
@@ -177,7 +191,6 @@
         }
 
         function downloadInvite() {
-            // Button ko disable karein taake double click na ho
             const btn = document.getElementById('downloadBtn');
             btn.innerText = "Downloading...";
             btn.disabled = true;
@@ -185,21 +198,18 @@
             const guestName = document.getElementById('guestName').value || 'Guest';
             const original = document.getElementById('invite-preview');
             
-            // Background copy banayen 
             const clone = original.cloneNode(true);
             
-            // Base size 1024px rakhein, taake html2canvas ise theek se render kare
             clone.style.transform = 'none'; 
             clone.style.width = '1024px';
             clone.style.height = '1024px';
             clone.style.position = 'absolute'; 
-            clone.style.left = '-9999px'; // Screen se bahar rakhein taake user ko nazar na aaye
+            clone.style.left = '-9999px'; 
             clone.style.top = '0';
             clone.style.boxShadow = 'none';
             
             document.body.appendChild(clone);
             
-            // html2canvas settings - scale: 4 ka matlab 1024 x 4 = 4096px 4K Output
             html2canvas(clone, { 
                 scale: 4, 
                 useCORS: true,
@@ -209,17 +219,15 @@
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
                 
-                // 1.0 ka matlab 100% Quality, bina kisi compression ke
                 link.href = canvas.toDataURL('image/jpeg', 1.0); 
                 link.click();
                 
-                // Process mukammal hone ke baad clone delete kar dein
                 document.body.removeChild(clone);
                 btn.innerText = "Download Invite";
                 btn.disabled = false;
             }).catch(err => {
                 console.error("Download Error:", err);
-                alert("Error: Download fail ho gaya. Kripya check karein ke background image ('background.jpg') sahi folder me mojood hai.");
+                alert("Error: Download fail ho gaya.");
                 document.body.removeChild(clone);
                 btn.innerText = "Download Invite";
                 btn.disabled = false;

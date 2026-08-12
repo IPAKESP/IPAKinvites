@@ -63,6 +63,7 @@
             font-weight: bold; 
             color: white; 
             font-size: 16px;
+            transition: background 0.3s;
         }
         .btn-download { background: #2563eb; }
         .btn-download:hover { background: #1d4ed8; }
@@ -187,36 +188,38 @@
             // Background copy banayen 
             const clone = original.cloneNode(true);
             
-            // Sirf 1024px ka size rakhein aur html2canvas se HD render lenge
+            // Base size 1024px rakhein, taake html2canvas ise theek se render kare
             clone.style.transform = 'none'; 
             clone.style.width = '1024px';
             clone.style.height = '1024px';
             clone.style.position = 'absolute'; 
-            clone.style.left = '-9999px'; // Screen se bahar rakhein
+            clone.style.left = '-9999px'; // Screen se bahar rakhein taake user ko nazar na aaye
             clone.style.top = '0';
             clone.style.boxShadow = 'none';
             
             document.body.appendChild(clone);
             
-            // html2canvas settings - scale: 2 (2048x2048 HD output)
+            // html2canvas settings - scale: 4 ka matlab 1024 x 4 = 4096px 4K Output
             html2canvas(clone, { 
-                scale: 2, 
+                scale: 4, 
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff'
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `IPAK_Dawat_2026_${guestName.replace(/\s+/g, '_')}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.9); // Quality set to 90%
+                
+                // 1.0 ka matlab 100% Quality, bina kisi compression ke
+                link.href = canvas.toDataURL('image/jpeg', 1.0); 
                 link.click();
                 
-                // Process mukammal hone ke baad saaf kar dein
+                // Process mukammal hone ke baad clone delete kar dein
                 document.body.removeChild(clone);
                 btn.innerText = "Download Invite";
                 btn.disabled = false;
             }).catch(err => {
                 console.error("Download Error:", err);
-                alert("Error: Download fail ho gaya. Kripya check karein ke background image ('background.jpg') sahi folder me mojood hai aur aap local server use kar rahay hain.");
+                alert("Error: Download fail ho gaya. Kripya check karein ke background image ('background.jpg') sahi folder me mojood hai.");
                 document.body.removeChild(clone);
                 btn.innerText = "Download Invite";
                 btn.disabled = false;
